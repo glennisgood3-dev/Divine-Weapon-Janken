@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神兵猜拳 - Divine Weapon Janken</title>
+    <title>Divine Weapon Janken</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,11 +11,11 @@
         <!-- Main Menu -->
         <div id="mainMenu" class="screen active">
             <div class="ui-frame">
-                <h1 class="game-title">神兵猜拳</h1>
-                <h2 class="game-subtitle">Divine Weapon Janken</h2>
+                <h1 class="game-title">Divine Weapon Janken</h1>
+                <h2 class="game-subtitle">Strategic Rock Paper Scissors</h2>
                 <div class="menu-buttons">
-                    <button id="singlePlayerBtn" class="menu-btn primary">單人練習</button>
-                    <button id="multiPlayerBtn" class="menu-btn secondary" disabled>多人對戰 (開發中)</button>
+                    <button id="singlePlayerBtn" class="menu-btn primary">Single Player Practice</button>
+                    <button id="multiPlayerBtn" class="menu-btn secondary" disabled>Multiplayer (Coming Soon)</button>
                 </div>
             </div>
         </div>
@@ -23,25 +23,25 @@
         <!-- Faction Selection -->
         <div id="factionSelection" class="screen">
             <div class="ui-frame">
-                <h2>選擇你的派系</h2>
+                <h2>Choose Your Faction</h2>
                 <div class="faction-grid">
                     <div class="faction-card" data-faction="sword">
                         <div class="faction-icon sword-icon"></div>
-                        <h3>劍之派系</h3>
-                        <p class="faction-ability">《乘勝追擊》</p>
-                        <p class="faction-description">強化卡造成傷害時，額外造成1點傷害</p>
+                        <h3>Sword Faction</h3>
+                        <p class="faction-ability">《Relentless Strike》</p>
+                        <p class="faction-description">Enhanced cards deal +1 extra damage (3 total)</p>
                     </div>
                     <div class="faction-card" data-faction="shield">
                         <div class="faction-icon shield-icon"></div>
-                        <h3>盾之派系</h3>
-                        <p class="faction-ability">《屹立不搖》</p>
-                        <p class="faction-description">雙方平手時，你獲得一層護甲</p>
+                        <h3>Shield Faction</h3>
+                        <p class="faction-ability">《Unbreakable Defense》</p>
+                        <p class="faction-description">Gain 1 armor when both players tie</p>
                     </div>
                     <div class="faction-card" data-faction="spear">
                         <div class="faction-icon spear-icon"></div>
-                        <h3>槍之派系</h3>
-                        <p class="faction-ability">《回馬槍》</p>
-                        <p class="faction-description">上回合受傷時，本回合傷害+1</p>
+                        <h3>Spear Faction</h3>
+                        <p class="faction-ability">《Vengeful Counter》</p>
+                        <p class="faction-description">+1 damage this round if damaged last round</p>
                     </div>
                 </div>
             </div>
@@ -50,22 +50,22 @@
         <!-- Enhanced Card Selection -->
         <div id="enhancedCardSelection" class="screen">
             <div class="ui-frame">
-                <h2>選擇你的強化卡</h2>
+                <h2>Choose Your Enhanced Card</h2>
                 <div class="card-grid">
                     <div class="card enhanced" data-card="rock">
                         <div class="card-icon rock-icon"></div>
-                        <h3>強化石頭</h3>
-                        <p>對普通石頭：平手視為勝利</p>
+                        <h3>Enhanced Rock</h3>
+                        <p>Beats normal Rock on ties</p>
                     </div>
                     <div class="card enhanced" data-card="paper">
                         <div class="card-icon paper-icon"></div>
-                        <h3>強化布</h3>
-                        <p>對普通布：平手視為勝利</p>
+                        <h3>Enhanced Paper</h3>
+                        <p>Beats normal Paper on ties</p>
                     </div>
                     <div class="card enhanced" data-card="scissors">
                         <div class="card-icon scissors-icon"></div>
-                        <h3>強化剪刀</h3>
-                        <p>對普通剪刀：平手視為勝利</p>
+                        <h3>Enhanced Scissors</h3>
+                        <p>Beats normal Scissors on ties</p>
                     </div>
                 </div>
             </div>
@@ -84,10 +84,14 @@
                                 <span id="playerHP" class="hp-value">10</span>
                             </div>
                             <div class="armor-display">
-                                <span class="armor-label">護甲:</span>
+                                <span class="armor-label">Armor:</span>
                                 <span id="playerArmor" class="armor-value">0</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="faction-info-display">
+                        <div id="playerFactionName" class="faction-name">Your Faction</div>
+                        <div id="playerFactionAbility" class="faction-ability-text">Faction Ability</div>
                     </div>
                     <div class="enhanced-card-display">
                         <div id="playerEnhancedCard" class="card mini enhanced">
@@ -99,20 +103,21 @@
                 <!-- Battle Area -->
                 <div class="battle-area">
                     <div class="round-info">
-                        <span>回合 <span id="currentRound">1</span>/5</span>
+                        <span>Round <span id="currentRound">1</span>/5</span>
                     </div>
                     
                     <div class="card-battle-zone">
                         <div id="playerCardPlayed" class="card-slot player-slot">
-                            <div class="card-placeholder">選擇你的卡牌</div>
+                            <div class="card-placeholder">Choose your card</div>
                         </div>
                         <div class="vs-indicator">VS</div>
                         <div id="opponentCardPlayed" class="card-slot opponent-slot">
-                            <div class="card-placeholder">對手思考中...</div>
+                            <div class="card-placeholder">Opponent thinking...</div>
                         </div>
                     </div>
 
                     <div class="battle-result" id="battleResult"></div>
+                    <div class="round-summary" id="roundSummary"></div>
                 </div>
 
                 <!-- Opponent Info -->
@@ -125,10 +130,14 @@
                                 <span id="opponentHP" class="hp-value">10</span>
                             </div>
                             <div class="armor-display">
-                                <span class="armor-label">護甲:</span>
+                                <span class="armor-label">Armor:</span>
                                 <span id="opponentArmor" class="armor-value">0</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="faction-info-display">
+                        <div id="opponentFactionName" class="faction-name">AI Faction</div>
+                        <div id="opponentFactionAbility" class="faction-ability-text">AI Ability</div>
                     </div>
                     <div class="enhanced-card-display">
                         <div id="opponentEnhancedCard" class="card mini enhanced">
@@ -141,15 +150,15 @@
                 <div class="player-hand">
                     <div class="card playable" data-card="rock">
                         <div class="card-icon rock-icon"></div>
-                        <span>石頭</span>
+                        <span>Rock</span>
                     </div>
                     <div class="card playable" data-card="paper">
                         <div class="card-icon paper-icon"></div>
-                        <span>布</span>
+                        <span>Paper</span>
                     </div>
                     <div class="card playable" data-card="scissors">
                         <div class="card-icon scissors-icon"></div>
-                        <span>剪刀</span>
+                        <span>Scissors</span>
                     </div>
                 </div>
             </div>
@@ -158,27 +167,27 @@
         <!-- Game Result -->
         <div id="gameResult" class="screen">
             <div class="ui-frame">
-                <h2 id="resultTitle">遊戲結果</h2>
+                <h2 id="resultTitle">Game Result</h2>
                 <div class="result-content">
                     <div id="resultMessage" class="result-message"></div>
                     <div class="final-stats">
                         <div class="stat-row">
-                            <span>最終HP:</span>
+                            <span>Your Final HP:</span>
                             <span id="finalPlayerHP"></span>
                         </div>
                         <div class="stat-row">
-                            <span>對手HP:</span>
+                            <span>Opponent HP:</span>
                             <span id="finalOpponentHP"></span>
                         </div>
                         <div class="stat-row">
-                            <span>總回合數:</span>
+                            <span>Total Rounds:</span>
                             <span id="totalRounds"></span>
                         </div>
                     </div>
                 </div>
                 <div class="result-buttons">
-                    <button id="playAgainBtn" class="menu-btn primary">再玩一次</button>
-                    <button id="backToMenuBtn" class="menu-btn secondary">返回主選單</button>
+                    <button id="playAgainBtn" class="menu-btn primary">Play Again</button>
+                    <button id="backToMenuBtn" class="menu-btn secondary">Back to Menu</button>
                 </div>
             </div>
         </div>

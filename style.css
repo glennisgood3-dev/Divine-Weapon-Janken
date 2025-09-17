@@ -444,23 +444,101 @@ h3 {
     text-shadow: 2px 2px 4px var(--shadow-color);
 }
 
-.battle-result {
-    margin-top: 1.5rem;
-    font-size: 1.3rem;
+/* Faction Info Display */
+.faction-info-display {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.faction-name {
     font-weight: bold;
-    min-height: 2rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.faction-ability-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Battle Result - Enhanced */
+.battle-result {
+    margin: 1.5rem 0;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.8rem;
+    min-height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.5s ease;
+    transform: scale(0.8);
+    opacity: 0;
+    border: 4px solid transparent;
+    position: relative;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.battle-result.show {
+    transform: scale(1.15);
+    opacity: 1;
+    animation: resultPulse 1.2s ease-out;
 }
 
 .battle-result.win {
-    color: #4caf50;
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    border-color: #66BB6A;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .battle-result.lose {
-    color: #f44336;
+    background: linear-gradient(135deg, #f44336, #da190b);
+    color: white;
+    box-shadow: 0 0 30px rgba(244, 67, 54, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    border-color: #EF5350;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .battle-result.tie {
-    color: var(--text-secondary);
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    box-shadow: 0 0 30px rgba(255, 152, 0, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    border-color: #FFA726;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Round Summary */
+.round-summary {
+    margin: 1rem 0;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.2rem;
+    color: #333;
+    min-height: 3rem;
+    transition: all 0.3s ease;
+    border: 2px solid #ffd700;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px);
+    opacity: 0;
+}
+
+.round-summary.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* Player Hand */
@@ -614,6 +692,51 @@ h3 {
 
 .heal-flash {
     animation: healFlash 0.5s ease-in-out;
+}
+
+/* Enhanced Result Animations */
+@keyframes resultPulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+@keyframes winGlow {
+    0%, 100% {
+        box-shadow: 0 0 30px rgba(76, 175, 80, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 50px rgba(76, 175, 80, 1), inset 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+}
+
+@keyframes loseShake {
+    0%, 100% {
+        transform: scale(1.1) translateX(0);
+    }
+    25% {
+        transform: scale(1.1) translateX(-5px);
+    }
+    75% {
+        transform: scale(1.1) translateX(5px);
+    }
+}
+
+.battle-result.win.show {
+    animation: resultPulse 0.8s ease-out, winGlow 2s ease-in-out infinite;
+}
+
+.battle-result.lose.show {
+    animation: resultPulse 0.8s ease-out, loseShake 0.5s ease-in-out;
 }
 
 /* Mobile Optimizations */

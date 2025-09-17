@@ -1,6 +1,6 @@
 /**
- * 神兵猜拳 - 單人模式控制器
- * 處理UI互動和遊戲流程
+ * Divine Weapon Janken - Single Player Controller
+ * Handles UI interactions and game flow
  */
 
 class SinglePlayerGame {
@@ -129,6 +129,23 @@ class SinglePlayerGame {
         playerFactionIcon.className = `faction-icon ${this.gameState.player.faction}-icon`;
         opponentFactionIcon.className = `faction-icon ${this.gameState.opponent.faction}-icon`;
         
+        const factionNames = {
+            sword: 'Sword Faction',
+            shield: 'Shield Faction',
+            spear: 'Spear Faction'
+        };
+        
+        const factionAbilities = {
+            sword: 'Enhanced cards deal +1 extra damage',
+            shield: 'Gain 1 armor when both players tie',
+            spear: '+1 damage if damaged last round'
+        };
+        
+        document.getElementById('playerFactionName').textContent = factionNames[this.gameState.player.faction];
+        document.getElementById('playerFactionAbility').textContent = factionAbilities[this.gameState.player.faction];
+        document.getElementById('opponentFactionName').textContent = `AI: ${factionNames[this.gameState.opponent.faction]}`;
+        document.getElementById('opponentFactionAbility').textContent = factionAbilities[this.gameState.opponent.faction];
+        
         this.updateEnhancedCardDisplay();
         
         this.resetBattleZone();
@@ -157,11 +174,16 @@ class SinglePlayerGame {
         const playerSlot = document.getElementById('playerCardPlayed');
         const opponentSlot = document.getElementById('opponentCardPlayed');
         const battleResult = document.getElementById('battleResult');
+        const roundSummary = document.getElementById('roundSummary');
         
-        playerSlot.innerHTML = '<div class="card-placeholder">選擇你的卡牌</div>';
-        opponentSlot.innerHTML = '<div class="card-placeholder">對手思考中...</div>';
+        playerSlot.innerHTML = '<div class="card-placeholder">Choose your card</div>';
+        opponentSlot.innerHTML = '<div class="card-placeholder">Opponent thinking...</div>';
         battleResult.textContent = '';
         battleResult.className = 'battle-result';
+        if (roundSummary) {
+            roundSummary.textContent = '';
+            roundSummary.className = 'round-summary';
+        }
     }
     
     enablePlayerCards() {
@@ -222,9 +244,9 @@ class SinglePlayerGame {
     
     getCardDisplayName(cardType) {
         const names = {
-            rock: '石頭',
-            paper: '布',
-            scissors: '剪刀'
+            rock: 'Rock',
+            paper: 'Paper',
+            scissors: 'Scissors'
         };
         return names[cardType] || cardType;
     }
@@ -240,50 +262,74 @@ class SinglePlayerGame {
         if (isGameOver(this.gameState)) {
             setTimeout(() => {
                 this.showGameResult();
-            }, 2000);
+            }, 4000);
         } else {
             setTimeout(() => {
+                this.resetBattleZone();
                 this.enablePlayerCards();
-            }, 2000);
+            }, 4000);
         }
     }
     
     displayBattleResult(roundResult) {
         const battleResultDiv = document.getElementById('battleResult');
+        const roundSummary = document.getElementById('roundSummary');
         let resultText = '';
         let resultClass = '';
+        let summaryText = '';
         
         switch (roundResult.battleResult) {
             case BATTLE_RESULTS.WIN:
-                resultText = '你獲勝！';
+                resultText = '🎉 YOU WIN! 🎉';
                 resultClass = 'win';
                 break;
             case BATTLE_RESULTS.LOSE:
-                resultText = '你落敗！';
+                resultText = '💥 YOU LOSE! 💥';
                 resultClass = 'lose';
                 break;
             case BATTLE_RESULTS.TIE:
-                resultText = '平手！';
+                resultText = '⚖️ TIE ROUND! ⚖️';
                 resultClass = 'tie';
                 break;
         }
         
         if (roundResult.playerDamageResult) {
-            resultText += ` 你受到 ${roundResult.playerDamageResult.actualDamage} 點傷害`;
+            summaryText += `You took ${roundResult.playerDamageResult.actualDamage} damage`;
             if (roundResult.playerDamageResult.armorUsed > 0) {
-                resultText += ` (護甲抵銷 ${roundResult.playerDamageResult.armorUsed} 點)`;
+                summaryText += ` (${roundResult.playerDamageResult.armorUsed} blocked by armor)`;
             }
         }
         
         if (roundResult.opponentDamageResult) {
-            resultText += ` 對手受到 ${roundResult.opponentDamageResult.actualDamage} 點傷害`;
+            if (summaryText) summaryText += ' • ';
+            summaryText += `Opponent took ${roundResult.opponentDamageResult.actualDamage} damage`;
             if (roundResult.opponentDamageResult.armorUsed > 0) {
-                resultText += ` (護甲抵銷 ${roundResult.opponentDamageResult.armorUsed} 點)`;
+                summaryText += ` (${roundResult.opponentDamageResult.armorUsed} blocked by armor)`;
             }
+        }
+        
+        if (roundResult.battleResult === BATTLE_RESULTS.TIE && this.gameState.player.faction === FACTIONS.SHIELD) {
+            if (summaryText) summaryText += ' • ';
+            summaryText += 'Shield ability: +1 armor gained!';
         }
         
         battleResultDiv.textContent = resultText;
         battleResultDiv.className = `battle-result ${resultClass}`;
+        
+        if (roundSummary && summaryText) {
+            roundSummary.textContent = summaryText;
+            roundSummary.className = 'round-summary';
+        }
+        
+        setTimeout(() => {
+            battleResultDiv.classList.add('show');
+        }, 200);
+        
+        if (roundSummary && summaryText) {
+            setTimeout(() => {
+                roundSummary.classList.add('show');
+            }, 800);
+        }
         
         this.addVisualEffects(roundResult);
     }
@@ -328,18 +374,18 @@ class SinglePlayerGame {
         
         switch (gameResult.winner) {
             case 'player':
-                resultTitle.textContent = '勝利！';
-                resultMessage.textContent = '恭喜你獲得勝利！';
+                resultTitle.textContent = 'Victory!';
+                resultMessage.textContent = 'Congratulations! You won the battle!';
                 resultMessage.style.color = '#4caf50';
                 break;
             case 'opponent':
-                resultTitle.textContent = '敗北！';
-                resultMessage.textContent = '很遺憾，你被擊敗了。';
+                resultTitle.textContent = 'Defeat!';
+                resultMessage.textContent = 'Unfortunately, you were defeated. Better luck next time!';
                 resultMessage.style.color = '#f44336';
                 break;
             case 'tie':
-                resultTitle.textContent = '平手！';
-                resultMessage.textContent = '勢均力敵的對決！';
+                resultTitle.textContent = 'Draw!';
+                resultMessage.textContent = 'An evenly matched battle!';
                 resultMessage.style.color = '#ff9800';
                 break;
         }
