@@ -1,0 +1,8 @@
+# Assets Images Directory
+
+This directory will contain all game images including:
+- background.png
+- ui_frame.png
+- faction icons (faction_sword.png, faction_shield.png, faction_spear.png)
+- card images (card_rock.png, card_paper.png, card_scissors.png, card_back.png)
+- effect icons (icon_armor.png, icon_enhanced_glow.png)

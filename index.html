@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神兵猜拳 - Divine Weapon Janken</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen active">
+            <div class="ui-frame">
+                <h1 class="game-title">神兵猜拳</h1>
+                <h2 class="game-subtitle">Divine Weapon Janken</h2>
+                <div class="menu-buttons">
+                    <button id="singlePlayerBtn" class="menu-btn primary">單人練習</button>
+                    <button id="multiPlayerBtn" class="menu-btn secondary" disabled>多人對戰 (開發中)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faction Selection -->
+        <div id="factionSelection" class="screen">
+            <div class="ui-frame">
+                <h2>選擇你的派系</h2>
+                <div class="faction-grid">
+                    <div class="faction-card" data-faction="sword">
+                        <div class="faction-icon sword-icon"></div>
+                        <h3>劍之派系</h3>
+                        <p class="faction-ability">《乘勝追擊》</p>
+                        <p class="faction-description">強化卡造成傷害時，額外造成1點傷害</p>
+                    </div>
+                    <div class="faction-card" data-faction="shield">
+                        <div class="faction-icon shield-icon"></div>
+                        <h3>盾之派系</h3>
+                        <p class="faction-ability">《屹立不搖》</p>
+                        <p class="faction-description">雙方平手時，你獲得一層護甲</p>
+                    </div>
+                    <div class="faction-card" data-faction="spear">
+                        <div class="faction-icon spear-icon"></div>
+                        <h3>槍之派系</h3>
+                        <p class="faction-ability">《回馬槍》</p>
+                        <p class="faction-description">上回合受傷時，本回合傷害+1</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Card Selection -->
+        <div id="enhancedCardSelection" class="screen">
+            <div class="ui-frame">
+                <h2>選擇你的強化卡</h2>
+                <div class="card-grid">
+                    <div class="card enhanced" data-card="rock">
+                        <div class="card-icon rock-icon"></div>
+                        <h3>強化石頭</h3>
+                        <p>對普通石頭：平手視為勝利</p>
+                    </div>
+                    <div class="card enhanced" data-card="paper">
+                        <div class="card-icon paper-icon"></div>
+                        <h3>強化布</h3>
+                        <p>對普通布：平手視為勝利</p>
+                    </div>
+                    <div class="card enhanced" data-card="scissors">
+                        <div class="card-icon scissors-icon"></div>
+                        <h3>強化剪刀</h3>
+                        <p>對普通剪刀：平手視為勝利</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Battle -->
+        <div id="gameBattle" class="screen">
+            <div class="battle-ui">
+                <!-- Player Info -->
+                <div class="player-info">
+                    <div class="player-avatar">
+                        <div id="playerFactionIcon" class="faction-icon"></div>
+                        <div class="player-stats">
+                            <div class="hp-bar">
+                                <span class="hp-label">HP:</span>
+                                <span id="playerHP" class="hp-value">10</span>
+                            </div>
+                            <div class="armor-display">
+                                <span class="armor-label">護甲:</span>
+                                <span id="playerArmor" class="armor-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="enhanced-card-display">
+                        <div id="playerEnhancedCard" class="card mini enhanced">
+                            <div class="enhanced-glow"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Battle Area -->
+                <div class="battle-area">
+                    <div class="round-info">
+                        <span>回合 <span id="currentRound">1</span>/5</span>
+                    </div>
+                    
+                    <div class="card-battle-zone">
+                        <div id="playerCardPlayed" class="card-slot player-slot">
+                            <div class="card-placeholder">選擇你的卡牌</div>
+                        </div>
+                        <div class="vs-indicator">VS</div>
+                        <div id="opponentCardPlayed" class="card-slot opponent-slot">
+                            <div class="card-placeholder">對手思考中...</div>
+                        </div>
+                    </div>
+
+                    <div class="battle-result" id="battleResult"></div>
+                </div>
+
+                <!-- Opponent Info -->
+                <div class="opponent-info">
+                    <div class="player-avatar">
+                        <div id="opponentFactionIcon" class="faction-icon"></div>
+                        <div class="player-stats">
+                            <div class="hp-bar">
+                                <span class="hp-label">HP:</span>
+                                <span id="opponentHP" class="hp-value">10</span>
+                            </div>
+                            <div class="armor-display">
+                                <span class="armor-label">護甲:</span>
+                                <span id="opponentArmor" class="armor-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="enhanced-card-display">
+                        <div id="opponentEnhancedCard" class="card mini enhanced">
+                            <div class="enhanced-glow"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Cards -->
+                <div class="player-hand">
+                    <div class="card playable" data-card="rock">
+                        <div class="card-icon rock-icon"></div>
+                        <span>石頭</span>
+                    </div>
+                    <div class="card playable" data-card="paper">
+                        <div class="card-icon paper-icon"></div>
+                        <span>布</span>
+                    </div>
+                    <div class="card playable" data-card="scissors">
+                        <div class="card-icon scissors-icon"></div>
+                        <span>剪刀</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Result -->
+        <div id="gameResult" class="screen">
+            <div class="ui-frame">
+                <h2 id="resultTitle">遊戲結果</h2>
+                <div class="result-content">
+                    <div id="resultMessage" class="result-message"></div>
+                    <div class="final-stats">
+                        <div class="stat-row">
+                            <span>最終HP:</span>
+                            <span id="finalPlayerHP"></span>
+                        </div>
+                        <div class="stat-row">
+                            <span>對手HP:</span>
+                            <span id="finalOpponentHP"></span>
+                        </div>
+                        <div class="stat-row">
+                            <span>總回合數:</span>
+                            <span id="totalRounds"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="result-buttons">
+                    <button id="playAgainBtn" class="menu-btn primary">再玩一次</button>
+                    <button id="backToMenuBtn" class="menu-btn secondary">返回主選單</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/core_logic.js"></script>
+    <script src="js/single_player.js"></script>
+</body>
+</html>

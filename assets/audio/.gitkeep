@@ -1,0 +1,10 @@
+# Assets Audio Directory
+
+This directory will contain all game audio including:
+- music_main_theme.mp3
+- sfx_card_play.wav
+- sfx_clash_win.wav, sfx_clash_lose.wav, sfx_clash_tie.wav
+- sfx_damage_take.wav
+- sfx_armor_gain.wav
+- sfx_sword_ability.wav, sfx_shield_ability.wav, sfx_spear_ability.wav
+- sfx_ui_click.wav
