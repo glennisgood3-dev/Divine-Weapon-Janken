@@ -173,17 +173,9 @@ class SinglePlayerGame {
     resetBattleZone() {
         const playerSlot = document.getElementById('playerCardPlayed');
         const opponentSlot = document.getElementById('opponentCardPlayed');
-        const battleResult = document.getElementById('battleResult');
-        const roundSummary = document.getElementById('roundSummary');
         
         playerSlot.innerHTML = '<div class="card-placeholder">Choose your card</div>';
         opponentSlot.innerHTML = '<div class="card-placeholder">Opponent thinking...</div>';
-        battleResult.textContent = '';
-        battleResult.className = 'battle-result';
-        if (roundSummary) {
-            roundSummary.textContent = '';
-            roundSummary.className = 'round-summary';
-        }
     }
     
     enablePlayerCards() {
@@ -199,18 +191,28 @@ class SinglePlayerGame {
     }
     
     playCard(cardType) {
-        if (!this.gameState.isGameActive) return;
+        console.log('=== DEBUG: playCard called ===');
+        console.log('cardType:', cardType);
+        console.log('gameState.isGameActive:', this.gameState.isGameActive);
+        
+        if (!this.gameState.isGameActive) {
+            console.log('DEBUG: Game not active, returning early');
+            return;
+        }
         
         this.disablePlayerCards();
         
         this.displayPlayerCard(cardType);
         
         const aiCard = getAIChoice(this.gameState, this.aiDifficulty);
+        console.log('DEBUG: AI chose card:', aiCard);
         
         setTimeout(() => {
+            console.log('DEBUG: About to display opponent card');
             this.displayOpponentCard(aiCard);
             
             setTimeout(() => {
+                console.log('DEBUG: About to call executeRound');
                 this.executeRound(cardType, aiCard);
             }, 500);
         }, 1000);
@@ -252,43 +254,71 @@ class SinglePlayerGame {
     }
     
     executeRound(playerCard, opponentCard) {
-        const result = playRound(this.gameState, playerCard, opponentCard);
-        const roundResult = result.roundResult;
+        console.log('=== DEBUG: executeRound called ===');
+        console.log('playerCard:', playerCard);
+        console.log('opponentCard:', opponentCard);
+        console.log('gameState before playRound:', this.gameState);
         
-        this.displayBattleResult(roundResult);
-        
-        this.updateBattleUI();
-        
-        if (isGameOver(this.gameState)) {
-            setTimeout(() => {
-                this.showGameResult();
-            }, 6000);
-        } else {
-            setTimeout(() => {
-                this.resetBattleZone();
-                this.enablePlayerCards();
-            }, 6000);
+        try {
+            const result = playRound(this.gameState, playerCard, opponentCard);
+            console.log('DEBUG: playRound result:', result);
+            
+            const roundResult = result.roundResult;
+            console.log('DEBUG: roundResult extracted:', roundResult);
+            
+            this.displayBattleResult(roundResult);
+            
+            this.updateBattleUI();
+            
+            if (isGameOver(this.gameState)) {
+                setTimeout(() => {
+                    this.showGameResult();
+                }, 6000);
+            } else {
+                setTimeout(() => {
+                    this.resetBattleZone();
+                    this.enablePlayerCards();
+                }, 6000);
+            }
+        } catch (error) {
+            console.error('DEBUG: Error in executeRound:', error);
+            console.error('DEBUG: Error stack:', error.stack);
         }
     }
     
     displayBattleResult(roundResult) {
+        console.log('=== DEBUG: displayBattleResult called ===');
+        console.log('roundResult:', roundResult);
+        console.log('roundResult.battleResult:', roundResult.battleResult);
+        console.log('typeof roundResult.battleResult:', typeof roundResult.battleResult);
+        
         const battleResultDiv = document.getElementById('battleResult');
         const roundSummary = document.getElementById('roundSummary');
         let resultText = '';
         let resultClass = '';
         let summaryText = '';
         
+        console.log('battleResultDiv element:', battleResultDiv);
+        
         switch (roundResult.battleResult) {
             case 'win':
                 resultText = '🎉 YOU WIN! 🎉';
                 resultClass = 'win';
+                console.log('DEBUG: Matched WIN case');
                 break;
             case 'lose':
                 resultText = '💥 YOU LOSE! 💥';
                 resultClass = 'lose';
+                console.log('DEBUG: Matched LOSE case');
                 break;
             case 'tie':
                 resultText = '⚖️ TIE ROUND! ⚖️';
+                resultClass = 'tie';
+                console.log('DEBUG: Matched TIE case');
+                break;
+            default:
+                console.log('DEBUG: NO CASE MATCHED! battleResult value:', roundResult.battleResult);
+                resultText = 'UNKNOWN RESULT';
                 resultClass = 'tie';
                 break;
         }
@@ -313,23 +343,44 @@ class SinglePlayerGame {
             summaryText += 'Shield ability: +1 armor gained!';
         }
         
+        console.log('DEBUG: Setting battle result text:', resultText);
+        console.log('DEBUG: Setting battle result class:', `battle-result ${resultClass}`);
+        
         battleResultDiv.textContent = resultText;
         battleResultDiv.className = `battle-result ${resultClass}`;
+        
+        console.log('DEBUG: After setting - textContent:', battleResultDiv.textContent);
+        console.log('DEBUG: After setting - className:', battleResultDiv.className);
         
         if (roundSummary && summaryText) {
             roundSummary.textContent = summaryText;
             roundSummary.className = 'round-summary';
         }
         
+        console.log('DEBUG: Adding show class immediately');
+        battleResultDiv.classList.add('show');
+        console.log('DEBUG: Final className after show:', battleResultDiv.className);
+        
         setTimeout(() => {
-            battleResultDiv.classList.add('show');
-        }, 200);
+            const computedStyle = window.getComputedStyle(battleResultDiv);
+            console.log('DEBUG: Final computed opacity:', computedStyle.opacity);
+            console.log('DEBUG: Final computed transform:', computedStyle.transform);
+        }, 100);
         
         if (roundSummary && summaryText) {
             setTimeout(() => {
                 roundSummary.classList.add('show');
             }, 800);
         }
+        
+        setTimeout(() => {
+            battleResultDiv.textContent = '';
+            battleResultDiv.className = 'battle-result';
+            if (roundSummary) {
+                roundSummary.textContent = '';
+                roundSummary.className = 'round-summary';
+            }
+        }, 8000);
         
         this.addVisualEffects(roundResult);
     }
@@ -410,5 +461,5 @@ class SinglePlayerGame {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new SinglePlayerGame();
+    window.game = new SinglePlayerGame();
 });

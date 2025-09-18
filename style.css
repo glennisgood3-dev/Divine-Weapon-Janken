@@ -490,8 +490,8 @@ h3 {
 }
 
 .battle-result.show {
-    transform: scale(1.15);
-    opacity: 1;
+    transform: scale(1.15) !important;
+    opacity: 1 !important;
     animation: resultPulse 1.2s ease-out;
 }
 
