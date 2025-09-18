@@ -32,11 +32,7 @@ class SinglePlayerGame {
             });
         });
         
-        document.querySelectorAll('.player-hand .card').forEach(card => {
-            card.addEventListener('click', (e) => {
-                this.playCard(e.currentTarget.dataset.card);
-            });
-        });
+        this.attachPlayerCardListeners();
         
         document.getElementById('playAgainBtn').addEventListener('click', () => {
             this.restartGame();
@@ -44,6 +40,19 @@ class SinglePlayerGame {
         
         document.getElementById('backToMenuBtn').addEventListener('click', () => {
             this.backToMainMenu();
+        });
+    }
+    
+    attachPlayerCardListeners() {
+        document.querySelectorAll('.player-hand .card').forEach(card => {
+            card.replaceWith(card.cloneNode(true));
+        });
+        
+        document.querySelectorAll('.player-hand .card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                console.log('Card clicked:', e.currentTarget.dataset.card);
+                this.playCard(e.currentTarget.dataset.card);
+            });
         });
     }
     
@@ -148,8 +157,6 @@ class SinglePlayerGame {
         
         this.updateEnhancedCardDisplay();
         
-        this.resetBattleZone();
-        
         this.enablePlayerCards();
     }
     
@@ -171,17 +178,48 @@ class SinglePlayerGame {
     }
     
     resetBattleZone() {
+        console.log('=== DEBUG: resetBattleZone called ===');
         const playerSlot = document.getElementById('playerCardPlayed');
         const opponentSlot = document.getElementById('opponentCardPlayed');
+        const battleResultDiv = document.getElementById('battleResult');
+        const roundSummary = document.getElementById('roundSummary');
+        
+        console.log('RESET: Before reset - textContent:', battleResultDiv.textContent, 'className:', battleResultDiv.className);
         
         playerSlot.innerHTML = '<div class="card-placeholder">Choose your card</div>';
         opponentSlot.innerHTML = '<div class="card-placeholder">Opponent thinking...</div>';
+        
+        if (battleResultDiv.classList.contains('show')) {
+            console.log('RESET: Removing show class and scheduling clear');
+            battleResultDiv.classList.remove('show');
+            setTimeout(() => {
+                console.log('RESET: Clearing battle result after timeout');
+                battleResultDiv.textContent = '';
+                battleResultDiv.className = 'battle-result';
+            }, 500); // Wait for fade out animation
+        } else {
+            console.log('RESET: Clearing battle result immediately');
+            battleResultDiv.textContent = '';
+            battleResultDiv.className = 'battle-result';
+        }
+        
+        if (roundSummary && roundSummary.classList.contains('show')) {
+            roundSummary.classList.remove('show');
+            setTimeout(() => {
+                roundSummary.textContent = '';
+                roundSummary.className = 'round-summary';
+            }, 500);
+        } else if (roundSummary) {
+            roundSummary.textContent = '';
+            roundSummary.className = 'round-summary';
+        }
     }
     
     enablePlayerCards() {
         document.querySelectorAll('.player-hand .card').forEach(card => {
             card.classList.remove('disabled');
         });
+        this.attachPlayerCardListeners();
     }
     
     disablePlayerCards() {
@@ -273,12 +311,12 @@ class SinglePlayerGame {
             if (isGameOver(this.gameState)) {
                 setTimeout(() => {
                     this.showGameResult();
-                }, 6000);
+                }, 8000);
             } else {
                 setTimeout(() => {
                     this.resetBattleZone();
                     this.enablePlayerCards();
-                }, 6000);
+                }, 8000);
             }
         } catch (error) {
             console.error('DEBUG: Error in executeRound:', error);
@@ -299,6 +337,33 @@ class SinglePlayerGame {
         let summaryText = '';
         
         console.log('battleResultDiv element:', battleResultDiv);
+        console.log('BEFORE setting - textContent:', battleResultDiv.textContent);
+        console.log('BEFORE setting - className:', battleResultDiv.className);
+        
+        if (this.battleResultTimeout) {
+            clearTimeout(this.battleResultTimeout);
+            this.battleResultTimeout = null;
+        }
+        
+        if (!this.battleResultObserver) {
+            this.battleResultObserver = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        console.log('MUTATION: className changed from', mutation.oldValue, 'to', battleResultDiv.className);
+                    }
+                    if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                        console.log('MUTATION: textContent changed to', battleResultDiv.textContent);
+                    }
+                });
+            });
+            this.battleResultObserver.observe(battleResultDiv, {
+                attributes: true,
+                attributeOldValue: true,
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        }
         
         switch (roundResult.battleResult) {
             case 'win':
@@ -357,30 +422,35 @@ class SinglePlayerGame {
             roundSummary.className = 'round-summary';
         }
         
+        battleResultDiv.offsetHeight;
+        
         console.log('DEBUG: Adding show class immediately');
         battleResultDiv.classList.add('show');
         console.log('DEBUG: Final className after show:', battleResultDiv.className);
         
         setTimeout(() => {
+            console.log('DEBUG: State after 50ms - textContent:', battleResultDiv.textContent, 'className:', battleResultDiv.className);
+            const computedStyle = window.getComputedStyle(battleResultDiv);
+            console.log('DEBUG: Computed opacity after 50ms:', computedStyle.opacity);
+            console.log('DEBUG: Computed transform after 50ms:', computedStyle.transform);
+        }, 50);
+        
+        setTimeout(() => {
+            console.log('DEBUG: State after 100ms - textContent:', battleResultDiv.textContent, 'className:', battleResultDiv.className);
             const computedStyle = window.getComputedStyle(battleResultDiv);
             console.log('DEBUG: Final computed opacity:', computedStyle.opacity);
             console.log('DEBUG: Final computed transform:', computedStyle.transform);
         }, 100);
+        
+        setTimeout(() => {
+            console.log('DEBUG: State after 500ms - textContent:', battleResultDiv.textContent, 'className:', battleResultDiv.className);
+        }, 500);
         
         if (roundSummary && summaryText) {
             setTimeout(() => {
                 roundSummary.classList.add('show');
             }, 800);
         }
-        
-        setTimeout(() => {
-            battleResultDiv.textContent = '';
-            battleResultDiv.className = 'battle-result';
-            if (roundSummary) {
-                roundSummary.textContent = '';
-                roundSummary.className = 'round-summary';
-            }
-        }, 8000);
         
         this.addVisualEffects(roundResult);
     }
