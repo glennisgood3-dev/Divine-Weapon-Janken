@@ -705,7 +705,7 @@ h3 {
         opacity: 0.8;
     }
     100% {
-        transform: scale(1.1);
+        transform: scale(1.15);
         opacity: 1;
     }
 }
@@ -732,11 +732,11 @@ h3 {
 }
 
 .battle-result.win.show {
-    animation: resultPulse 0.8s ease-out, winGlow 2s ease-in-out infinite;
+    animation: resultPulse 0.8s ease-out forwards, winGlow 2s ease-in-out infinite 0.8s;
 }
 
 .battle-result.lose.show {
-    animation: resultPulse 0.8s ease-out, loseShake 0.5s ease-in-out;
+    animation: resultPulse 0.8s ease-out forwards, loseShake 0.5s ease-in-out 0.8s;
 }
 
 /* Mobile Optimizations */
