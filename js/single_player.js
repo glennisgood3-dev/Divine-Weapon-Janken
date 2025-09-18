@@ -189,19 +189,7 @@ class SinglePlayerGame {
         playerSlot.innerHTML = '<div class="card-placeholder">Choose your card</div>';
         opponentSlot.innerHTML = '<div class="card-placeholder">Opponent thinking...</div>';
         
-        if (battleResultDiv.classList.contains('show')) {
-            console.log('RESET: Removing show class and scheduling clear');
-            battleResultDiv.classList.remove('show');
-            setTimeout(() => {
-                console.log('RESET: Clearing battle result after timeout');
-                battleResultDiv.textContent = '';
-                battleResultDiv.className = 'battle-result';
-            }, 500); // Wait for fade out animation
-        } else {
-            console.log('RESET: Clearing battle result immediately');
-            battleResultDiv.textContent = '';
-            battleResultDiv.className = 'battle-result';
-        }
+        console.log('RESET: Keeping battle result visible for user to read');
         
         if (roundSummary && roundSummary.classList.contains('show')) {
             roundSummary.classList.remove('show');
@@ -213,6 +201,15 @@ class SinglePlayerGame {
             roundSummary.textContent = '';
             roundSummary.className = 'round-summary';
         }
+        
+        setTimeout(() => {
+            console.log('RESET: Finally clearing battle result after long delay');
+            battleResultDiv.classList.remove('show');
+            setTimeout(() => {
+                battleResultDiv.textContent = '';
+                battleResultDiv.className = 'battle-result';
+            }, 500);
+        }, 10000); // 10 second delay before clearing battle result
     }
     
     enablePlayerCards() {
@@ -297,6 +294,12 @@ class SinglePlayerGame {
         console.log('opponentCard:', opponentCard);
         console.log('gameState before playRound:', this.gameState);
         
+        if (this.roundTimeout) {
+            console.log('DEBUG: Clearing existing round timeout');
+            clearTimeout(this.roundTimeout);
+            this.roundTimeout = null;
+        }
+        
         try {
             const result = playRound(this.gameState, playerCard, opponentCard);
             console.log('DEBUG: playRound result:', result);
@@ -309,14 +312,16 @@ class SinglePlayerGame {
             this.updateBattleUI();
             
             if (isGameOver(this.gameState)) {
-                setTimeout(() => {
+                this.roundTimeout = setTimeout(() => {
+                    console.log('DEBUG: Game over timeout triggered');
                     this.showGameResult();
-                }, 8000);
+                }, 15000);
             } else {
-                setTimeout(() => {
+                this.roundTimeout = setTimeout(() => {
+                    console.log('DEBUG: Round reset timeout triggered');
                     this.resetBattleZone();
                     this.enablePlayerCards();
-                }, 8000);
+                }, 15000);
             }
         } catch (error) {
             console.error('DEBUG: Error in executeRound:', error);
