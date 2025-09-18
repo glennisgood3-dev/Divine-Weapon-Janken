@@ -262,12 +262,12 @@ class SinglePlayerGame {
         if (isGameOver(this.gameState)) {
             setTimeout(() => {
                 this.showGameResult();
-            }, 4000);
+            }, 6000);
         } else {
             setTimeout(() => {
                 this.resetBattleZone();
                 this.enablePlayerCards();
-            }, 4000);
+            }, 6000);
         }
     }
     
@@ -279,15 +279,15 @@ class SinglePlayerGame {
         let summaryText = '';
         
         switch (roundResult.battleResult) {
-            case BATTLE_RESULTS.WIN:
+            case 'win':
                 resultText = '🎉 YOU WIN! 🎉';
                 resultClass = 'win';
                 break;
-            case BATTLE_RESULTS.LOSE:
+            case 'lose':
                 resultText = '💥 YOU LOSE! 💥';
                 resultClass = 'lose';
                 break;
-            case BATTLE_RESULTS.TIE:
+            case 'tie':
                 resultText = '⚖️ TIE ROUND! ⚖️';
                 resultClass = 'tie';
                 break;
@@ -308,7 +308,7 @@ class SinglePlayerGame {
             }
         }
         
-        if (roundResult.battleResult === BATTLE_RESULTS.TIE && this.gameState.player.faction === FACTIONS.SHIELD) {
+        if (roundResult.battleResult === 'tie' && this.gameState.player.faction === 'shield') {
             if (summaryText) summaryText += ' • ';
             summaryText += 'Shield ability: +1 armor gained!';
         }
@@ -349,15 +349,15 @@ class SinglePlayerGame {
             }, 500);
         }
         
-        if (roundResult.battleResult === BATTLE_RESULTS.TIE) {
-            if (this.gameState.player.faction === FACTIONS.SHIELD) {
+        if (roundResult.battleResult === 'tie') {
+            if (this.gameState.player.faction === 'shield') {
                 document.querySelector('.player-info').classList.add('heal-flash');
                 setTimeout(() => {
                     document.querySelector('.player-info').classList.remove('heal-flash');
                 }, 500);
             }
             
-            if (this.gameState.opponent.faction === FACTIONS.SHIELD) {
+            if (this.gameState.opponent.faction === 'shield') {
                 document.querySelector('.opponent-info').classList.add('heal-flash');
                 setTimeout(() => {
                     document.querySelector('.opponent-info').classList.remove('heal-flash');
