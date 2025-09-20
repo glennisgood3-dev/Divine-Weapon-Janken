@@ -367,10 +367,20 @@ class SinglePlayerGame {
     }
     
     showGameResult() {
+        console.log('Showing game result screen'); // (important-comment)
         const gameResult = getGameResult(this.gameState);
+        console.log('Game result data:', gameResult); // (important-comment)
         
         const resultTitle = document.getElementById('resultTitle');
         const resultMessage = document.getElementById('resultMessage');
+        
+        console.log('Result title element:', resultTitle); // (important-comment)
+        console.log('Result message element:', resultMessage); // (important-comment)
+        
+        if (!resultTitle || !resultMessage) {
+            console.error('Result elements not found!'); // (important-comment)
+            return;
+        }
         
         switch (gameResult.winner) {
             case 'player':
@@ -388,11 +398,23 @@ class SinglePlayerGame {
                 resultMessage.textContent = 'An evenly matched battle!';
                 resultMessage.style.color = '#ff9800';
                 break;
+            default:
+                console.error('Unknown game result winner:', gameResult.winner); // (important-comment)
+                resultTitle.textContent = 'Game Over';
+                resultMessage.textContent = 'The battle has ended.';
+                resultMessage.style.color = '#ffffff';
         }
         
-        document.getElementById('finalPlayerHP').textContent = gameResult.playerFinalHP;
-        document.getElementById('finalOpponentHP').textContent = gameResult.opponentFinalHP;
-        document.getElementById('totalRounds').textContent = gameResult.totalRounds;
+        const finalPlayerHP = document.getElementById('finalPlayerHP');
+        const finalOpponentHP = document.getElementById('finalOpponentHP');
+        const totalRounds = document.getElementById('totalRounds');
+        
+        if (finalPlayerHP) finalPlayerHP.textContent = gameResult.playerFinalHP;
+        if (finalOpponentHP) finalOpponentHP.textContent = gameResult.opponentFinalHP;
+        if (totalRounds) totalRounds.textContent = gameResult.totalRounds;
+        
+        console.log('Set result title to:', resultTitle.textContent); // (important-comment)
+        console.log('Set result message to:', resultMessage.textContent); // (important-comment)
         
         this.showScreen('gameResult');
     }

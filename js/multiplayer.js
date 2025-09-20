@@ -26,6 +26,7 @@ class MultiplayerGame {
         
         document.querySelectorAll('.faction-card').forEach(card => {
             card.addEventListener('click', (e) => {
+                console.log('Faction card clicked:', e.currentTarget.dataset.faction, 'Connected:', this.isConnected, 'Game state:', this.gameState); // (important-comment)
                 if (this.isConnected && this.gameState) {
                     this.selectFaction(e.currentTarget.dataset.faction);
                 }
@@ -157,10 +158,12 @@ class MultiplayerGame {
     }
     
     handleMatchFound(data) {
+        console.log('Match found:', data); // (important-comment)
         this.gameId = data.gameId;
         this.playerNumber = data.playerNumber;
         this.opponentInfo = data.opponent;
         
+        console.log('Switching to faction selection screen'); // (important-comment)
         this.showScreen('factionSelection');
         this.updateMatchInfo();
     }
@@ -182,19 +185,29 @@ class MultiplayerGame {
     }
     
     selectFaction(faction) {
-        if (!this.isConnected) return;
+        console.log('Selecting faction:', faction, 'Connected:', this.isConnected); // (important-comment)
+        if (!this.isConnected) {
+            console.error('Not connected to server, cannot select faction'); // (important-comment)
+            return;
+        }
         
         document.querySelectorAll('.faction-card').forEach(card => {
             card.classList.remove('selected');
         });
         
-        document.querySelector(`[data-faction="${faction}"]`).classList.add('selected');
-        this.selectedFaction = faction;
-        
-        this.socket.emit('playerAction', {
-            type: 'selectFaction',
-            faction: faction
-        });
+        const factionCard = document.querySelector(`[data-faction="${faction}"]`);
+        if (factionCard) {
+            factionCard.classList.add('selected');
+            this.selectedFaction = faction;
+            
+            console.log('Emitting faction selection to server:', faction); // (important-comment)
+            this.socket.emit('playerAction', {
+                type: 'selectFaction',
+                faction: faction
+            });
+        } else {
+            console.error('Faction card not found:', faction); // (important-comment)
+        }
     }
     
     handleOpponentFactionSelected(data) {
@@ -204,7 +217,9 @@ class MultiplayerGame {
     }
     
     handlePhaseChange(data) {
+        console.log('Phase change received:', data); // (important-comment)
         if (data.phase === 'enhanced_card_selection') {
+            console.log('Advancing to enhanced card selection phase'); // (important-comment)
             setTimeout(() => {
                 this.showScreen('enhancedCardSelection');
                 this.updateMatchInfo();
@@ -401,12 +416,12 @@ class MultiplayerGame {
         if (data.isGameOver) {
             setTimeout(() => {
                 this.showGameResult();
-            }, 5000);
+            }, 2000);
         } else {
             setTimeout(() => {
                 this.resetBattleZone();
                 this.enablePlayerCards();
-            }, 5000);
+            }, 2000);
         }
     }
     
@@ -472,8 +487,17 @@ class MultiplayerGame {
     }
     
     showGameResult() {
+        console.log('Showing multiplayer game result screen'); // (important-comment)
         const resultTitle = document.getElementById('resultTitle');
         const resultMessage = document.getElementById('resultMessage');
+        
+        console.log('Result title element:', resultTitle); // (important-comment)
+        console.log('Result message element:', resultMessage); // (important-comment)
+        
+        if (!resultTitle || !resultMessage) {
+            console.error('Result elements not found in multiplayer!'); // (important-comment)
+            return;
+        }
         
         const myPlayer = this.playerNumber === 1 ? this.gameState.player1 : this.gameState.player2;
         const opponent = this.playerNumber === 1 ? this.gameState.player2 : this.gameState.player1;
@@ -486,6 +510,8 @@ class MultiplayerGame {
         } else {
             winner = 'opponent';
         }
+        
+        console.log('Game winner determined:', winner, 'Game state winner:', this.gameState.winner); // (important-comment)
         
         switch (winner) {
             case 'player':
@@ -503,11 +529,23 @@ class MultiplayerGame {
                 resultMessage.textContent = 'An evenly matched battle!';
                 resultMessage.style.color = '#ff9800';
                 break;
+            default:
+                console.error('Unknown winner:', winner); // (important-comment)
+                resultTitle.textContent = 'Game Over';
+                resultMessage.textContent = 'The battle has ended.';
+                resultMessage.style.color = '#ffffff';
         }
         
-        document.getElementById('finalPlayerHP').textContent = myPlayer.hp;
-        document.getElementById('finalOpponentHP').textContent = opponent.hp;
-        document.getElementById('totalRounds').textContent = this.gameState.currentRound - 1;
+        const finalPlayerHP = document.getElementById('finalPlayerHP');
+        const finalOpponentHP = document.getElementById('finalOpponentHP');
+        const totalRounds = document.getElementById('totalRounds');
+        
+        if (finalPlayerHP) finalPlayerHP.textContent = myPlayer.hp;
+        if (finalOpponentHP) finalOpponentHP.textContent = opponent.hp;
+        if (totalRounds) totalRounds.textContent = this.gameState.currentRound - 1;
+        
+        console.log('Set multiplayer result title to:', resultTitle.textContent); // (important-comment)
+        console.log('Set multiplayer result message to:', resultMessage.textContent); // (important-comment)
         
         this.showScreen('gameResult');
     }

@@ -169,11 +169,15 @@ class MultiplayerGameManager {
     }
 
     handleFactionSelection(gameState, player, faction, socketId) {
+        console.log('Handling faction selection:', socketId, faction, 'Game phase:', gameState.gamePhase); // (important-comment)
+        
         if (!Object.values(FACTIONS).includes(faction)) {
+            console.error('Invalid faction:', faction); // (important-comment)
             return { success: false, message: 'Invalid faction' };
         }
 
         player.faction = faction;
+        console.log('Player faction set:', socketId, faction); // (important-comment)
         
         const gameId = gameState.gameId;
         io.to(gameId).emit('playerFactionSelected', {
@@ -181,7 +185,15 @@ class MultiplayerGameManager {
             faction: faction
         });
 
-        if (gameState.player1.faction && gameState.player2.faction) {
+        const allPlayersHaveFaction = gameState.player1.faction && gameState.player2.faction;
+        console.log('All players have faction:', allPlayersHaveFaction); // (important-comment)
+        console.log('Player factions:', { // (important-comment)
+            player1: gameState.player1.faction, // (important-comment)
+            player2: gameState.player2.faction // (important-comment)
+        }); // (important-comment)
+
+        if (allPlayersHaveFaction) {
+            console.log('Advancing to enhanced card selection phase'); // (important-comment)
             gameState.gamePhase = 'enhanced_card_selection';
             io.to(gameId).emit('phaseChange', {
                 phase: 'enhanced_card_selection',
@@ -495,7 +507,9 @@ io.on('connection', (socket) => {
     socket.on('playerAction', (action) => {
         console.log('Player action:', socket.id, action);
         const result = gameManager.handlePlayerAction(socket.id, action);
+        console.log('Action result:', result); // (important-comment)
         if (!result.success) {
+            console.error('Action failed:', result.message); // (important-comment)
             socket.emit('actionError', { message: result.message });
         }
     });
