@@ -825,3 +825,91 @@ h3 {
         margin-bottom: 0.2rem;
     }
 }
+
+/* TASK-002: Round Transition Polish */
+.hidden {
+    display: none !important;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+.fade-in-then-out {
+    animation: fadeInThenOut 2s ease-in-out forwards;
+}
+
+#result-banner {
+    margin: 1.5rem 0;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.8rem;
+    min-height: 6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 100;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    border: 4px solid transparent;
+}
+
+#result-banner.win {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    border-color: #66BB6A;
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.8);
+    animation: resultGlow 1.2s ease-out;
+}
+
+#result-banner.lose {
+    background: linear-gradient(135deg, #f44336, #da190b);
+    border-color: #EF5350;
+    box-shadow: 0 0 30px rgba(244, 67, 54, 0.8);
+    animation: resultGlow 1.2s ease-out;
+}
+
+#result-banner.tie {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    border-color: #FFA726;
+    box-shadow: 0 0 30px rgba(255, 152, 0, 0.8);
+    animation: resultGlow 1.2s ease-out;
+}
+
+#round-start-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #2196F3;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes fadeInThenOut {
+    0% { opacity: 0; transform: scale(0.8); }
+    20% { opacity: 1; transform: scale(1.1); }
+    80% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(0.8); }
+}
+
+@keyframes resultGlow {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 1; }
+}

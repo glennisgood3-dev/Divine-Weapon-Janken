@@ -130,7 +130,7 @@ class SinglePlayerGame {
         document.getElementById('opponentHP').textContent = this.gameState.opponent.hp;
         document.getElementById('opponentArmor').textContent = this.gameState.opponent.armor;
         
-        document.getElementById('currentRound').textContent = this.gameState.currentRound;
+        document.getElementById('round-counter').textContent = this.gameState.currentRound;
         
         const playerFactionIcon = document.getElementById('playerFactionIcon');
         const opponentFactionIcon = document.getElementById('opponentFactionIcon');
@@ -293,23 +293,24 @@ class SinglePlayerGame {
             const roundResult = result.roundResult;
             console.log('DEBUG: roundResult extracted:', roundResult);
             
-            this.displayBattleResult(roundResult);
+            this.displayResultBanner(roundResult);
             
-            this.updateBattleUI();
+            this.updateBattleUIWithoutRoundCounter();
             
-            if (isGameOver(this.gameState)) {
-                this.roundTimeout = setTimeout(() => {
-                    console.log('DEBUG: Game over timeout triggered');
-                    this.showGameResult();
-                }, 2000);
-            } else {
-                this.roundTimeout = setTimeout(() => {
-                    console.log('DEBUG: Round reset timeout triggered');
-                    this.resetBattleZone();
-                    this.showNextRoundIndicator();
-                    this.enablePlayerCards();
-                }, 2000);
-            }
+            setTimeout(() => {
+                this.clearBoardWithAnimation(() => {
+                    if (isGameOver(this.gameState)) {
+                        this.showGameResult();
+                    } else {
+                        this.updateRoundCounter();
+                        
+                        this.announceNewRound(() => {
+                            this.enablePlayerCards();
+                        });
+                    }
+                });
+            }, 2000);
+            
         } catch (error) {
             console.error('DEBUG: Error in executeRound:', error);
             console.error('DEBUG: Error stack:', error.stack);
@@ -540,6 +541,105 @@ class SinglePlayerGame {
         this.startSinglePlayerGame();
     }
     
+    displayResultBanner(roundResult) {
+        const resultBanner = document.getElementById('result-banner');
+        let resultText = '';
+        let resultClass = '';
+        
+        switch (roundResult.battleResult) {
+            case 'win':
+                resultText = '🎉 YOU WIN! 🎉';
+                resultClass = 'win';
+                break;
+            case 'lose':
+                resultText = '💥 YOU LOSE! 💥';
+                resultClass = 'lose';
+                break;
+            case 'tie':
+                resultText = '⚖️ TIE! ⚖️';
+                resultClass = 'tie';
+                break;
+        }
+        
+        resultBanner.textContent = resultText;
+        resultBanner.className = `result-banner ${resultClass}`;
+        resultBanner.classList.remove('hidden');
+        
+        this.addVisualEffects(roundResult);
+    }
+    
+    clearBoardWithAnimation(callback) {
+        const resultBanner = document.getElementById('result-banner');
+        const playerCard = document.getElementById('playerCardPlayed');
+        const opponentCard = document.getElementById('opponentCardPlayed');
+        
+        resultBanner.classList.add('fade-out');
+        playerCard.classList.add('fade-out');
+        opponentCard.classList.add('fade-out');
+        
+        setTimeout(() => {
+            resultBanner.classList.add('hidden');
+            resultBanner.classList.remove('fade-out');
+            resultBanner.className = 'hidden';
+            
+            this.resetBattleZone();
+            
+            playerCard.classList.remove('fade-out');
+            opponentCard.classList.remove('fade-out');
+            
+            callback();
+        }, 500); // Match CSS animation duration
+    }
+    
+    updateBattleUIWithoutRoundCounter() {
+        document.getElementById('playerHP').textContent = this.gameState.player.hp;
+        document.getElementById('playerArmor').textContent = this.gameState.player.armor;
+        document.getElementById('opponentHP').textContent = this.gameState.opponent.hp;
+        document.getElementById('opponentArmor').textContent = this.gameState.opponent.armor;
+        
+        const playerFactionIcon = document.getElementById('playerFactionIcon');
+        const opponentFactionIcon = document.getElementById('opponentFactionIcon');
+        
+        const factionNames = {
+            sword: 'Sword Faction',
+            shield: 'Shield Faction',
+            spear: 'Spear Faction'
+        };
+        
+        const factionAbilities = {
+            sword: '《Relentless Strike》: Enhanced cards deal +1 extra damage',
+            shield: '《Unbreakable Defense》: Gain 1 armor when both players tie',
+            spear: '《Vengeful Counter》: +1 damage this round if damaged last round'
+        };
+        
+        playerFactionIcon.className = `faction-icon ${this.gameState.player.faction}-icon`;
+        opponentFactionIcon.className = `faction-icon ${this.gameState.opponent.faction}-icon`;
+        
+        document.getElementById('playerFactionName').textContent = factionNames[this.gameState.player.faction];
+        document.getElementById('playerFactionAbility').textContent = factionAbilities[this.gameState.player.faction];
+        document.getElementById('opponentFactionName').textContent = factionNames[this.gameState.opponent.faction];
+        document.getElementById('opponentFactionAbility').textContent = factionAbilities[this.gameState.opponent.faction];
+        
+        this.updateEnhancedCardDisplay();
+    }
+    
+    updateRoundCounter() {
+        document.getElementById('round-counter').textContent = this.gameState.currentRound;
+    }
+    
+    announceNewRound(callback) {
+        const roundIndicator = document.getElementById('round-start-indicator');
+        roundIndicator.textContent = `🎯 ROUND ${this.gameState.currentRound} START! 🎯`;
+        roundIndicator.classList.remove('hidden');
+        roundIndicator.classList.add('fade-in-then-out');
+        
+        setTimeout(() => {
+            roundIndicator.classList.add('hidden');
+            roundIndicator.classList.remove('fade-in-then-out');
+            callback();
+        }, 2000); // Match CSS animation duration
+    }
+
     backToMainMenu() {
         this.gameState = null;
         this.selectedFaction = null;

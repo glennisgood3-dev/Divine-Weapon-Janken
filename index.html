@@ -103,10 +103,10 @@
                 <!-- Battle Area -->
                 <div class="battle-area">
                     <div class="round-info">
-                        <span>Round <span id="currentRound">1</span>/5</span>
+                        <span>Round <span id="round-counter">1</span>/5</span>
                     </div>
                     
-                    <div class="card-battle-zone">
+                    <div class="card-battle-zone" id="card-battle-zone">
                         <div id="playerCardPlayed" class="card-slot player-slot">
                             <div class="card-placeholder">Choose your card</div>
                         </div>
@@ -116,6 +116,7 @@
                         </div>
                     </div>
 
+                    <div id="result-banner" class="hidden"></div>
                     <div class="battle-result" id="battleResult"></div>
                     <div class="round-summary" id="roundSummary"></div>
                 </div>
@@ -192,6 +193,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Round Start Indicator (Full Screen Overlay) -->
+    <div id="round-start-indicator" class="hidden"></div>
 
     <script src="js/core_logic.js"></script>
     <script src="js/single_player.js"></script>
