@@ -60,7 +60,45 @@ class SinglePlayerGame {
         this.gameState = createGameState();
         this.selectedFaction = null;
         this.selectedEnhancedCard = null;
+        
+        this.removeMultiplayerEventListeners();
+        
         this.showScreen('factionSelection');
+    }
+    
+    removeMultiplayerEventListeners() {
+        document.querySelectorAll('.player-hand .card').forEach(card => {
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+        });
+        
+        document.querySelectorAll('.player-hand .card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                this.playCard(e.currentTarget.dataset.card);
+            });
+        });
+        
+        document.querySelectorAll('.faction-card').forEach(card => {
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+        });
+        
+        document.querySelectorAll('.faction-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                this.selectFaction(e.currentTarget.dataset.faction);
+            });
+        });
+        
+        document.querySelectorAll('.card-grid .card').forEach(card => {
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+        });
+        
+        document.querySelectorAll('.card-grid .card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                this.selectEnhancedCard(e.currentTarget.dataset.card);
+            });
+        });
     }
     
     selectFaction(faction) {
@@ -170,6 +208,102 @@ class SinglePlayerGame {
         }
     }
     
+    initializeBattleLog() {
+        const battleLog = document.getElementById('battleLog');
+        battleLog.innerHTML = '<div class="battle-log-placeholder">戰鬥記錄將在這裡顯示...</div>';
+    }
+    
+    addBattleLogEntry(roundResult) {
+        const battleLog = document.getElementById('battleLog');
+        
+        if (!battleLog) {
+            return;
+        }
+        
+        const placeholder = battleLog.querySelector('.battle-log-placeholder');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        
+        const logEntry = document.createElement('div');
+        logEntry.className = 'battle-log-entry';
+        
+        const cardNames = {
+            rock: '石頭',
+            paper: '布',
+            scissors: '剪刀'
+        };
+        
+        const playerCardName = cardNames[roundResult.playerCard];
+        const opponentCardName = cardNames[roundResult.opponentCard];
+        const playerEnhanced = roundResult.playerCard === this.gameState.player.enhancedCard ? ' (強化)' : '';
+        const opponentEnhanced = roundResult.opponentCard === this.gameState.opponent.enhancedCard ? ' (強化)' : '';
+        
+        let resultText = '';
+        let resultClass = '';
+        switch (roundResult.battleResult) {
+            case 'win':
+                resultText = '你獲勝！';
+                resultClass = 'win';
+                break;
+            case 'lose':
+                resultText = '你失敗！';
+                resultClass = 'lose';
+                break;
+            case 'tie':
+                resultText = '平手！';
+                resultClass = 'tie';
+                break;
+        }
+        
+        let damageText = '';
+        if (roundResult.playerDamageResult && roundResult.playerDamageResult.actualDamage > 0) {
+            damageText += `你受到 ${roundResult.playerDamageResult.actualDamage} 點傷害`;
+            if (roundResult.playerDamageResult.armorUsed > 0) {
+                damageText += ` (護甲抵擋 ${roundResult.playerDamageResult.armorUsed} 點)`;
+            }
+        }
+        if (roundResult.opponentDamageResult && roundResult.opponentDamageResult.actualDamage > 0) {
+            if (damageText) damageText += ' • ';
+            damageText += `對手受到 ${roundResult.opponentDamageResult.actualDamage} 點傷害`;
+            if (roundResult.opponentDamageResult.armorUsed > 0) {
+                damageText += ` (護甲抵擋 ${roundResult.opponentDamageResult.armorUsed} 點)`;
+            }
+        }
+        if (!damageText) {
+            damageText = '無傷害';
+        }
+        
+        if (roundResult.battleResult === 'tie') {
+            if (this.gameState.player.faction === 'shield') {
+                damageText += ' • 你獲得 1 點護甲';
+            }
+            if (this.gameState.opponent.faction === 'shield') {
+                damageText += ' • 對手獲得 1 點護甲';
+            }
+        }
+        
+        logEntry.innerHTML = `
+            <div class="log-round-header">第 ${roundResult.round} 回合</div>
+            <div class="log-choices">
+                <span>你: ${playerCardName}${playerEnhanced}</span>
+                <span>對手: ${opponentCardName}${opponentEnhanced}</span>
+            </div>
+            <div class="log-result ${resultClass}">${resultText}</div>
+            <div class="log-damage">${damageText}</div>
+            <div class="log-damage">血量: 你 ${roundResult.playerHP} • 對手 ${roundResult.opponentHP}</div>
+        `;
+        
+        battleLog.insertBefore(logEntry, battleLog.firstChild);
+        
+        const entries = battleLog.querySelectorAll('.battle-log-entry');
+        if (entries.length > 5) {
+            entries[entries.length - 1].remove();
+        }
+        
+        battleLog.scrollTop = 0;
+    }
+    
     resetBattleZone() {
         const playerSlot = document.getElementById('playerCardPlayed');
         const opponentSlot = document.getElementById('opponentCardPlayed');
@@ -199,7 +333,9 @@ class SinglePlayerGame {
     }
     
     playCard(cardType) {
-        if (!this.gameState.isGameActive) return;
+        if (!this.gameState.isGameActive) {
+            return;
+        }
         
         this.disablePlayerCards();
         
@@ -256,6 +392,7 @@ class SinglePlayerGame {
         const roundResult = result.roundResult;
         
         this.displayBattleResult(roundResult);
+        this.addBattleLogEntry(roundResult);
         
         this.updateBattleUI();
         

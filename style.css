@@ -541,6 +541,102 @@ h3 {
     transform: translateY(0);
 }
 
+/* Battle Log */
+.battle-log-container {
+    margin: 1.5rem 0;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    max-width: 100%;
+}
+
+.battle-log-title {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.8rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.battle-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 0.8rem;
+}
+
+.battle-log-placeholder {
+    color: var(--text-primary);
+    opacity: 0.6;
+    text-align: center;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.battle-log-entry {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.8rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    animation: logEntryAppear 0.3s ease-out;
+}
+
+.battle-log-entry:last-child {
+    margin-bottom: 0;
+}
+
+.log-round-header {
+    font-weight: bold;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+}
+
+.log-choices {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+}
+
+.log-result {
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+}
+
+.log-result.win {
+    color: #4CAF50;
+}
+
+.log-result.lose {
+    color: #f44336;
+}
+
+.log-result.tie {
+    color: #ff9800;
+}
+
+.log-damage {
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    opacity: 0.9;
+}
+
+@keyframes logEntryAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Player Hand */
 .player-hand {
     grid-area: player-hand;
@@ -857,5 +953,29 @@ h3 {
         height: 20px;
         font-size: 0.8rem;
         margin-bottom: 0.2rem;
+    }
+    
+    /* Mobile optimizations for battle log */
+    .battle-log-container {
+        margin: 1rem 0;
+        padding: 0.8rem;
+    }
+    
+    .battle-log {
+        max-height: 150px;
+        padding: 0.6rem;
+    }
+    
+    .battle-log-entry {
+        padding: 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .log-choices {
+        font-size: 0.75rem;
+    }
+    
+    .log-damage {
+        font-size: 0.7rem;
     }
 }
