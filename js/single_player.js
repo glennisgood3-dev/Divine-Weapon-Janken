@@ -262,12 +262,12 @@ class SinglePlayerGame {
         if (isGameOver(this.gameState)) {
             setTimeout(() => {
                 this.showGameResult();
-            }, 4000);
+            }, 2000);
         } else {
             setTimeout(() => {
                 this.resetBattleZone();
                 this.enablePlayerCards();
-            }, 4000);
+            }, 2000);
         }
     }
     

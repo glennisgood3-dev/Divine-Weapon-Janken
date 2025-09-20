@@ -15,7 +15,7 @@
                 <h2 class="game-subtitle">Strategic Rock Paper Scissors</h2>
                 <div class="menu-buttons">
                     <button id="singlePlayerBtn" class="menu-btn primary">Single Player Practice</button>
-                    <button id="multiPlayerBtn" class="menu-btn secondary" disabled>Multiplayer (Coming Soon)</button>
+                    <button id="multiPlayerBtn" class="menu-btn secondary">Multiplayer</button>
                 </div>
             </div>
         </div>
@@ -164,6 +164,18 @@
             </div>
         </div>
 
+        <!-- Multiplayer Waiting -->
+        <div id="multiplayerWaiting" class="screen">
+            <div class="ui-frame">
+                <h2>Multiplayer Matchmaking</h2>
+                <div class="waiting-animation">
+                    <div class="spinner"></div>
+                </div>
+                <p>Searching for opponent...</p>
+                <button onclick="multiplayerGame.backToMainMenu()" class="menu-btn secondary">Cancel</button>
+            </div>
+        </div>
+
         <!-- Game Result -->
         <div id="gameResult" class="screen">
             <div class="ui-frame">
@@ -193,7 +205,9 @@
         </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script src="js/core_logic.js"></script>
     <script src="js/single_player.js"></script>
+    <script src="js/multiplayer.js"></script>
 </body>
 </html>
