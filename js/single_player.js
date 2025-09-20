@@ -181,15 +181,10 @@ class SinglePlayerGame {
         console.log('=== DEBUG: resetBattleZone called ===');
         const playerSlot = document.getElementById('playerCardPlayed');
         const opponentSlot = document.getElementById('opponentCardPlayed');
-        const battleResultDiv = document.getElementById('battleResult');
         const roundSummary = document.getElementById('roundSummary');
-        
-        console.log('RESET: Before reset - textContent:', battleResultDiv.textContent, 'className:', battleResultDiv.className);
         
         playerSlot.innerHTML = '<div class="card-placeholder">Choose your card</div>';
         opponentSlot.innerHTML = '<div class="card-placeholder">Opponent thinking...</div>';
-        
-        console.log('RESET: Keeping battle result visible for user to read');
         
         if (roundSummary && roundSummary.classList.contains('show')) {
             roundSummary.classList.remove('show');
@@ -201,15 +196,6 @@ class SinglePlayerGame {
             roundSummary.textContent = '';
             roundSummary.className = 'round-summary';
         }
-        
-        setTimeout(() => {
-            console.log('RESET: Finally clearing battle result after long delay');
-            battleResultDiv.classList.remove('show');
-            setTimeout(() => {
-                battleResultDiv.textContent = '';
-                battleResultDiv.className = 'battle-result';
-            }, 500);
-        }, 10000); // 10 second delay before clearing battle result
     }
     
     enablePlayerCards() {
@@ -315,13 +301,14 @@ class SinglePlayerGame {
                 this.roundTimeout = setTimeout(() => {
                     console.log('DEBUG: Game over timeout triggered');
                     this.showGameResult();
-                }, 15000);
+                }, 2000);
             } else {
                 this.roundTimeout = setTimeout(() => {
                     console.log('DEBUG: Round reset timeout triggered');
                     this.resetBattleZone();
+                    this.showNextRoundIndicator();
                     this.enablePlayerCards();
-                }, 15000);
+                }, 2000);
             }
         } catch (error) {
             console.error('DEBUG: Error in executeRound:', error);
@@ -489,6 +476,32 @@ class SinglePlayerGame {
                     document.querySelector('.opponent-info').classList.remove('heal-flash');
                 }, 500);
             }
+        }
+    }
+    
+    showNextRoundIndicator() {
+        const battleResultDiv = document.getElementById('battleResult');
+        const currentRound = this.gameState.currentRound;
+        const maxRounds = 5;
+        
+        if (currentRound <= maxRounds) {
+            console.log('DEBUG: Showing round start indicator for round', currentRound);
+            
+            battleResultDiv.classList.remove('show');
+            setTimeout(() => {
+                battleResultDiv.textContent = `🎯 ROUND ${currentRound} START! 🎯`;
+                battleResultDiv.className = 'battle-result round-start';
+                battleResultDiv.classList.add('show');
+                
+                setTimeout(() => {
+                    battleResultDiv.classList.remove('show');
+                    setTimeout(() => {
+                        battleResultDiv.textContent = '';
+                        battleResultDiv.className = 'battle-result';
+                        console.log('DEBUG: Round start indicator cleared');
+                    }, 500);
+                }, 2500);
+            }, 500);
         }
     }
     
